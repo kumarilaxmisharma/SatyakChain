@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  ISSUER
+  HOLDER
+}
+
+enum DocumentStatus {
+  PENDING
+  ISSUED
+  REVOKED
+  EXPIRED
+}
+
+model User {
+  id            String      @id @default(cuid())
+  walletAddress String      @unique
+  role          UserRole    @default(HOLDER)
+  name          String?
+  email         String?
+  nonce         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  issuedDocs    Document[]  @relation("IssuedDocuments")
+  receivedDocs  Document[]  @relation("ReceivedDocuments")
+  auditLogs     AuditLog[]
+
+  @@index([walletAddress])
+}
+
+model Document {
+  id               String         @id @default(cuid())
+  documentHash     String         @unique
+  title            String
+  description      String?
+  fileUrl          String
+  fileType         String
+  fileSize         Int
+  tokenId          String?        @unique
+  txHash           String?
+  status           DocumentStatus @default(PENDING)
+  issuedAt         DateTime?
+  expiresAt        DateTime?
+  revokedAt        DateTime?
+  revocationReason String?
+
+  issuerId         String
+  issuer           User           @relation("IssuedDocuments", fields: [issuerId], references: [id])
+
+  holderId         String
+  holder           User           @relation("ReceivedDocuments", fields: [holderId], references: [id])
+
+  verifications    Verification[]
+  auditLogs        AuditLog[]
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([documentHash])
+  @@index([tokenId])
+  @@index([issuerId])
+  @@index([holderId])
+  @@index([status])
+}
+
+model Verification {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id])
+  verifierIp  String?
+  result      Boolean
+  checkedHash String
+  createdAt   DateTime @default(now())
+
+  @@index([documentId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String    @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id])
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime  @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+}

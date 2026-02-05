@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: certichain-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: certichain
+      POSTGRES_PASSWORD: certichain
+      POSTGRES_DB: certichain
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - certichain-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U certichain -d certichain"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Optional - for production)
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: certichain-api
+  #   restart: unless-stopped
+  #   environment:
+  #     DATABASE_URL: postgresql://certichain:certichain@postgres:5432/certichain
+  #     NODE_ENV: production
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - certichain-network
+
+  # Adminer (Database Management UI) - Development only
+  adminer:
+    image: adminer:4
+    container_name: certichain-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - certichain-network
+    depends_on:
+      - postgres
+
+networks:
+  certichain-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
