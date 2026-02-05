@@ -1,8 +1,8 @@
-# CertiChain: Decentralized Document Verification
+# SatyakChain: Decentralized Document Verification
 
 <div align="center">
 
-![CertiChain Logo](https://img.shields.io/badge/CertiChain-Blockchain%20Verified-6366f1?style=for-the-badge&logo=ethereum&logoColor=white)
+![SatyakChain Logo](https://img.shields.io/badge/SatyakChain-Blockchain%20Verified-6366f1?style=for-the-badge&logo=ethereum&logoColor=white)
 
 **A high-integrity, decentralized platform for issuing, storing, and verifying digital documents.**
 
@@ -20,9 +20,9 @@
 
 ## 📌 Overview
 
-CertiChain bridges the gap between traditional data storage and blockchain immutability. By anchoring a cryptographic **SHA-256 hash** of documents to the **Ethereum blockchain**, CertiChain ensures that any tampering is instantly detectable.
+SatyakChain bridges the gap between traditional data storage and blockchain immutability. By anchoring a cryptographic **SHA-256 hash** of documents to the **Ethereum blockchain**, SatyakChain ensures that any tampering is instantly detectable.
 
-### ✨ Key Features
+### ✨ Key Features       
 
 | Feature | Description |
 |---------|-------------|
